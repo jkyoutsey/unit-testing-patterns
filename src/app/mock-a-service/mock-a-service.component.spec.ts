@@ -1,20 +1,19 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
-import { JustAService } from '../services/just-a/just-a.service';
+import { StarWarsService } from '../services/star-wars/star-wars.service';
 import { MockAServiceComponent } from './mock-a-service.component';
 
 describe('MockAServiceComponent Preferred Way To Mock A Service', () => {
 	let component: MockAServiceComponent;
 	let fixture: ComponentFixture<MockAServiceComponent>;
-
-	let mockService: jasmine.SpyObj<JustAService>;
+	let mockService: jasmine.SpyObj<StarWarsService>;
 
 	beforeEach(async () => {
-		mockService = jasmine.createSpyObj('jas', ['getStarWarsFilm$']);
+		mockService = jasmine.createSpyObj(['getStarWarsFilm$']);
 		await TestBed.configureTestingModule({
 			declarations: [MockAServiceComponent],
-			providers: [{ provide: JustAService, useValue: mockService }],
+			providers: [{ provide: StarWarsService, useValue: mockService }],
 		}).compileComponents();
 
 		fixture = TestBed.createComponent(MockAServiceComponent);
@@ -36,7 +35,7 @@ describe('MockAServiceComponent Preferred Way To Mock A Service', () => {
 describe('MockAServiceComponent Another Way To Mock A Service', () => {
 	let component: MockAServiceComponent;
 	let fixture: ComponentFixture<MockAServiceComponent>;
-	let service: JustAService;
+	let service: StarWarsService;
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
@@ -47,7 +46,7 @@ describe('MockAServiceComponent Another Way To Mock A Service', () => {
 
 		fixture = TestBed.createComponent(MockAServiceComponent);
 		component = fixture.componentInstance;
-		service = TestBed.inject(JustAService);
+		service = TestBed.inject(StarWarsService);
 		fixture.detectChanges();
 	});
 
