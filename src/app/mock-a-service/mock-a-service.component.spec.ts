@@ -16,9 +16,7 @@ describe('MockAServiceComponent Preferred Way To Mock A Service', () => {
 			declarations: [MockAServiceComponent],
 			providers: [{ provide: JustAService, useValue: mockService }],
 		}).compileComponents();
-	});
 
-	beforeEach(() => {
 		fixture = TestBed.createComponent(MockAServiceComponent);
 		component = fixture.componentInstance;
 		fixture.detectChanges();
@@ -46,9 +44,7 @@ describe('MockAServiceComponent Another Way To Mock A Service', () => {
 			// If the service has a lot of dependencies this can get much more complex:
 			imports: [HttpClientTestingModule],
 		}).compileComponents();
-	});
 
-	beforeEach(() => {
 		fixture = TestBed.createComponent(MockAServiceComponent);
 		component = fixture.componentInstance;
 		service = TestBed.inject(JustAService);
