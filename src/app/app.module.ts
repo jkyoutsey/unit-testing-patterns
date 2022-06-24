@@ -10,6 +10,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MockAServiceComponent } from './mock-a-service/mock-a-service.component';
 import { UnitTestViewModelComponent } from './unit-test-view-model/unit-test-view-model.component';
+import {LetModule} from '@ngrx/component';
 
 @NgModule({
 	declarations: [AppComponent, MockAServiceComponent, UnitTestViewModelComponent],
@@ -22,6 +23,7 @@ import { UnitTestViewModelComponent } from './unit-test-view-model/unit-test-vie
 		MatSelectModule,
 		MatFormFieldModule,
 		MatProgressSpinnerModule,
+    LetModule
 	],
 	providers: [],
 	bootstrap: [AppComponent],

@@ -3,6 +3,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import {LetModule} from '@ngrx/component';
 import { firstValueFrom, of } from 'rxjs';
 import { StarWarsCharacter } from '../services/star-wars/star-wars-character';
 import { StarWarsFilm } from '../services/star-wars/star-wars-film';
@@ -42,7 +43,7 @@ describe('UnitTestViewModelComponent', () => {
 		mockStarWarsService.getFilms$.and.returnValue(of(mockFilms));
 
 		await TestBed.configureTestingModule({
-			imports: [ReactiveFormsModule, MatSelectModule, MatFormFieldModule, NoopAnimationsModule],
+			imports: [ReactiveFormsModule, MatSelectModule, MatFormFieldModule, NoopAnimationsModule, LetModule],
 			declarations: [UnitTestViewModelComponent],
 			providers: [{ provide: StarWarsService, useValue: mockStarWarsService }],
 		}).compileComponents();
