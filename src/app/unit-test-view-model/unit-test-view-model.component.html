@@ -1,4 +1,6 @@
 <ng-container *ngIf="vm$ | async as vm">
+	<mat-spinner color="accent" *ngIf="vm.loading && !vm.films?.length"></mat-spinner>
+
 	<form [formGroup]="form">
 		<mat-form-field *ngIf="vm.films?.length">
 			<mat-label>Select a Star Wars Film</mat-label>
@@ -8,6 +10,8 @@
 				</mat-option>
 			</mat-select>
 		</mat-form-field>
+
+		<mat-spinner color="accent" *ngIf="vm.loading && vm.films?.length && !vm.characters?.length"></mat-spinner>
 
 		<mat-form-field *ngIf="vm.characters?.length">
 			<mat-label>Select a Character</mat-label>

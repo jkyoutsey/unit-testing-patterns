@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { firstValueFrom, of } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import { StarWarsCharacter } from '../services/star-wars/star-wars-character';
 import { StarWarsFilm } from '../services/star-wars/star-wars-film';
 import { StarWarsService } from '../services/star-wars/star-wars.service';
@@ -13,6 +14,9 @@ describe('UnitTestViewModelComponent', () => {
 	let component: UnitTestViewModelComponent;
 	let fixture: ComponentFixture<UnitTestViewModelComponent>;
 	let mockStarWarsService: jasmine.SpyObj<StarWarsService>;
+	let filmsSubject$: BehaviorSubject<StarWarsFilm[]>;
+	let charactersSubject$: BehaviorSubject<StarWarsCharacter[]>;
+	let loadingSubject$: BehaviorSubject<boolean>;
 
 	const mockFilms = [
 		{
@@ -32,17 +36,33 @@ describe('UnitTestViewModelComponent', () => {
 		},
 	] as StarWarsCharacter[];
 
-	beforeEach(async () => {
-		mockStarWarsService = jasmine.createSpyObj<StarWarsService>([
-			'getStarWarsFilm$',
-			'getFilms$',
-			'getCharactersInFilm$',
-		]);
+	const initialState: { films: StarWarsFilm[]; characters: StarWarsCharacter[]; loading: boolean } = {
+		films: [],
+		characters: [],
+		loading: false,
+	};
 
-		mockStarWarsService.getFilms$.and.returnValue(of(mockFilms));
+	beforeEach(async () => {
+		filmsSubject$ = new BehaviorSubject<StarWarsFilm[]>(initialState.films);
+		charactersSubject$ = new BehaviorSubject<StarWarsCharacter[]>(initialState.characters);
+		loadingSubject$ = new BehaviorSubject<boolean>(initialState.loading);
+		mockStarWarsService = jasmine.createSpyObj<StarWarsService>(
+			['getStarWarsFilm$', 'loadFilms', 'loadCharactersInFilm'],
+			{
+				loading$: loadingSubject$,
+				films$: filmsSubject$,
+				characters$: charactersSubject$,
+			}
+		);
 
 		await TestBed.configureTestingModule({
-			imports: [ReactiveFormsModule, MatSelectModule, MatFormFieldModule, NoopAnimationsModule],
+			imports: [
+				ReactiveFormsModule,
+				NoopAnimationsModule,
+				MatSelectModule,
+				MatFormFieldModule,
+				MatProgressSpinnerModule,
+			],
 			declarations: [UnitTestViewModelComponent],
 			providers: [{ provide: StarWarsService, useValue: mockStarWarsService }],
 		}).compileComponents();
@@ -56,27 +76,32 @@ describe('UnitTestViewModelComponent', () => {
 		expect(component).toBeTruthy();
 	});
 
-	it('should load films', async () => {
-		expect(mockStarWarsService.getFilms$).toHaveBeenCalledTimes(1);
-		expect(await firstValueFrom(component['vm$'])).toEqual({ films: mockFilms, characters: null });
+	const validateVm$Value = (expected = { ...initialState }) => {
+		component['vm$'].pipe(take(1)).subscribe({
+			next: vm =>
+				expect(vm).toEqual({
+					...initialState,
+					...expected,
+				}),
+		});
+	};
+
+	it('should load films', () => {
+		expect(mockStarWarsService.loadFilms).toHaveBeenCalledTimes(1);
+		filmsSubject$.next(mockFilms);
+		validateVm$Value({ ...initialState, films: mockFilms });
 	});
 
-	fit('should get characters when selected film changes', () => {
-		console.log('START');
-		const characterState = { films: mockFilms, characters: mockCharacters };
-		mockStarWarsService.getCharactersInFilm$.and.returnValue(of(mockCharacters));
+	it('should get characters when selected film changes', () => {
+		filmsSubject$.next(mockFilms);
 		component['form'].controls.film.setValue(mockFilms[0]);
+		expect(mockStarWarsService.loadCharactersInFilm).toHaveBeenCalledOnceWith(mockFilms[0]);
+		charactersSubject$.next(mockCharacters);
+		validateVm$Value({ ...initialState, films: mockFilms, characters: mockCharacters });
+	});
 
-		component['vm$']
-			// .pipe(
-			// 	filter(state => !!state.characters),
-			// 	take(1)
-			// )
-			.subscribe({
-				next: vm => expect(vm).toEqual(characterState),
-			});
-
-		expect(mockStarWarsService.getCharactersInFilm$).toHaveBeenCalledOnceWith(mockFilms[0]);
-		console.log('END');
+	it('should have vm connected to loading state', () => {
+		loadingSubject$.next(true);
+		validateVm$Value({ ...initialState, loading: true });
 	});
 });
