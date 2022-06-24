@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { combineLatest, map, of, startWith, switchMap } from 'rxjs';
+import { combineLatest, map, of, startWith, switchMap, tap } from 'rxjs';
 import { StarWarsCharacter } from '../services/star-wars/star-wars-character';
 import { StarWarsFilm } from '../services/star-wars/star-wars-film';
 import { StarWarsService } from '../services/star-wars/star-wars.service';
@@ -24,6 +24,7 @@ export class UnitTestViewModelComponent {
 	);
 
 	protected vm$ = combineLatest([this.films$, this.characters$]).pipe(
+		tap(vm => console.dir(vm)),
 		map(([films, characters]) => ({
 			films,
 			characters,
