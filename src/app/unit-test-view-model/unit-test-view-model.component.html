@@ -1,6 +1,6 @@
-<ng-container *ngIf="vm$ | async as vm">
+<ng-container *ngrxLet="vm$ as vm">
 	<form [formGroup]="form">
-		<mat-form-field *ngIf="vm.films?.length">
+		<mat-form-field>
 			<mat-label>Select a Star Wars Film</mat-label>
 			<mat-select formControlName="film">
 				<mat-option *ngFor="let film of vm.films" [value]="film">
@@ -9,7 +9,7 @@
 			</mat-select>
 		</mat-form-field>
 
-		<mat-form-field *ngIf="vm.characters?.length">
+		<mat-form-field>
 			<mat-label>Select a Character</mat-label>
 			<mat-select formControlName="character">
 				<mat-option *ngFor="let character of vm.characters" [value]="character">

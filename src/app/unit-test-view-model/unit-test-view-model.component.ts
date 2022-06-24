@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { combineLatest, map, of, startWith, switchMap, tap } from 'rxjs';
+import {logObservable} from '../operators/log-observable.operator';
 import { StarWarsCharacter } from '../services/star-wars/star-wars-character';
 import { StarWarsFilm } from '../services/star-wars/star-wars-film';
 import { StarWarsService } from '../services/star-wars/star-wars.service';
@@ -19,16 +20,18 @@ export class UnitTestViewModelComponent {
 	});
 
 	private characters$ = this.form.controls.film.valueChanges.pipe(
-		startWith(null),
+		// startWith(null),
 		switchMap(film => (!!film ? this.starWarsService.getCharactersInFilm$(film) : of(null)))
 	);
 
-	protected vm$ = combineLatest([this.films$, this.characters$]).pipe(
+	protected vm$ = combineLatest([this.films$.pipe(logObservable('films$')), this.characters$.pipe(logObservable('characters$'))]).pipe(
+    logObservable('combineLatest'),
 		tap(vm => console.dir(vm)),
 		map(([films, characters]) => ({
 			films,
 			characters,
-		}))
+		})),
+    logObservable('map')
 	);
 
 	constructor(private starWarsService: StarWarsService) {}
