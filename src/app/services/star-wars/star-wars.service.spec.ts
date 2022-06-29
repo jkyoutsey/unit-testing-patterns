@@ -24,7 +24,7 @@ describe('StarWarsService', () => {
 
 	it('should handle getStarWarsFilm$ success', () => {
 		service.getStarWarsFilm$(1).subscribe({
-			next: film => expect(film).toBeDefined,
+			next: film => expect(film).toBeDefined(),
 			error: fail,
 		});
 		controller.expectOne('https://swapi.dev/api/films/1/').flush('');
